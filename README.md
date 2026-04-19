@@ -1,2 +1,0 @@
-# mozok
-Test landing pages.
