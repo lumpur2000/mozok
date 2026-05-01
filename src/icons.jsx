@@ -14,6 +14,7 @@ const Icons = {
   Home: (p) => <Ic {...p} d="M3 11 12 4l9 7v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/>,
   Pulse: (p) => <Ic {...p} d="M3 12h3l2-5 4 10 2-5h7"/>,
   Chart: (p) => <Ic {...p} d={<g><path d="M3 3v18h18"/><path d="M7 15V9M12 15V5M17 15v-4"/></g>}/>,
+  Target: (p) => <Ic {...p} d={<g><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none"/></g>}/>,
   Menu: (p) => <Ic {...p} d={<g><path d="M4 6h16M4 12h16M4 18h10"/></g>}/>,
   Users: (p) => <Ic {...p} d={<g><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><circle cx="17" cy="9" r="2.6"/><path d="M15 14.5c1-0.3 2-0.5 3-0.5 2.5 0 4 1.5 4 4"/></g>}/>,
   Truck: (p) => <Ic {...p} d={<g><path d="M2 7h11v9H2zM13 10h5l3 3v3h-8z"/><circle cx="6" cy="18" r="1.8"/><circle cx="17" cy="18" r="1.8"/></g>}/>,

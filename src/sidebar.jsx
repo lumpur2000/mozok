@@ -19,47 +19,50 @@ function BrainLogo({ size = 28 }) {
   );
 }
 
-function Sidebar({ active, onNav, expanded, onToggle }) {
+function Sidebar({ active, onNav, expanded, onToggle, mobileOpen, isMobile }) {
   const { t } = useI18n();
   const navItems = [
     { key: 'dashboard', label: t.nav_dashboard, icon: 'Home' },
     { key: 'analytics', label: t.nav_analytics, icon: 'Chart' },
+    { key: 'controls', label: t.nav_controls, icon: 'Target' },
     { key: 'menu', label: t.nav_menu, icon: 'Menu' },
     { key: 'warehouse', label: t.nav_warehouse, icon: 'Box' },
     { key: 'staff', label: t.nav_staff, icon: 'Users' },
     { key: 'suppliers', label: t.nav_suppliers, icon: 'Truck' },
     { key: 'settings', label: t.nav_settings, icon: 'Gear' },
   ];
-  const W = expanded ? 224 : 64;
+  // On mobile: always render at expanded width (drawer); desktop uses collapse logic
+  const W = isMobile ? 240 : (expanded ? 224 : 64);
+  const showLabels = isMobile ? true : expanded;
   return (
-    <aside style={{ ...sbStyles.aside, width: W }}>
-      <div style={{ ...sbStyles.logoRow, justifyContent: expanded ? 'flex-start' : 'center', padding: expanded ? '18px 18px 14px' : '18px 0 14px' }}>
+    <aside className="app-sidebar" data-mobile-open={mobileOpen ? 'true' : 'false'} style={{ ...sbStyles.aside, width: W }}>
+      <div style={{ ...sbStyles.logoRow, justifyContent: showLabels ? 'flex-start' : 'center', padding: showLabels ? '18px 18px 14px' : '18px 0 14px' }}>
         <BrainLogo />
-        <div style={{ overflow: 'hidden', whiteSpace: 'nowrap', opacity: expanded ? 1 : 0, width: expanded ? 'auto' : 0, transition: 'opacity .2s, width .2s' }}>
+        <div style={{ overflow: 'hidden', whiteSpace: 'nowrap', opacity: showLabels ? 1 : 0, width: showLabels ? 'auto' : 0, transition: 'opacity .2s, width .2s' }}>
           <div style={sbStyles.logoTitle}>{t.brand1}</div>
           <div style={sbStyles.logoSub}>{t.brand2}</div>
         </div>
       </div>
 
-      <button onClick={onToggle} title={expanded ? 'Collapse' : 'Expand'} style={{ ...sbStyles.toggle, left: W - 14 }}>
+      <button className="sb-toggle" onClick={onToggle} title={expanded ? 'Collapse' : 'Expand'} style={{ ...sbStyles.toggle, left: W - 14 }}>
         <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
           style={{ transform: expanded ? 'rotate(180deg)' : 'none', transition: 'transform .2s' }}>
           <path d="m9 6 6 6-6 6"/>
         </svg>
       </button>
 
-      <nav style={{ display: 'flex', flexDirection: 'column', gap: 2, padding: expanded ? '8px 10px' : '8px 8px' }}>
+      <nav style={{ display: 'flex', flexDirection: 'column', gap: 2, padding: showLabels ? '8px 10px' : '8px 8px' }}>
         {navItems.map(item => {
           const Icon = Icons[item.icon];
           const isActive = active === item.key;
           return (
-            <button key={item.key} onClick={() => onNav(item.key)} title={!expanded ? item.label : undefined}
-              style={{ ...sbStyles.navItem, ...(isActive ? sbStyles.navItemActive : {}), justifyContent: expanded ? 'flex-start' : 'center', padding: expanded ? '9px 12px' : '10px 0' }}>
+            <button key={item.key} onClick={() => onNav(item.key)} title={!showLabels ? item.label : undefined}
+              style={{ ...sbStyles.navItem, ...(isActive ? sbStyles.navItemActive : {}), justifyContent: showLabels ? 'flex-start' : 'center', padding: showLabels ? '9px 12px' : '10px 0' }}>
               <span style={sbStyles.navIcon}><Icon size={18} /></span>
-              <span style={{ overflow: 'hidden', whiteSpace: 'nowrap', opacity: expanded ? 1 : 0, width: expanded ? 'auto' : 0, transition: 'opacity .18s' }}>{item.label}</span>
-              {expanded && item.badge && <span style={sbStyles.navBadge}>{item.badge}</span>}
-              {expanded && item.warn && <span style={sbStyles.navBadgeAmber}>!</span>}
-              {!expanded && (item.badge || item.warn) && <span style={sbStyles.collapsedDot} />}
+              <span style={{ overflow: 'hidden', whiteSpace: 'nowrap', opacity: showLabels ? 1 : 0, width: showLabels ? 'auto' : 0, transition: 'opacity .18s' }}>{item.label}</span>
+              {showLabels && item.badge && <span style={sbStyles.navBadge}>{item.badge}</span>}
+              {showLabels && item.warn && <span style={sbStyles.navBadgeAmber}>!</span>}
+              {!showLabels && (item.badge || item.warn) && <span style={sbStyles.collapsedDot} />}
             </button>
           );
         })}
@@ -67,9 +70,9 @@ function Sidebar({ active, onNav, expanded, onToggle }) {
 
       <div style={{ flex: 1 }} />
 
-      <div style={{ ...sbStyles.userRow, padding: expanded ? '10px 10px' : '10px 0', justifyContent: expanded ? 'flex-start' : 'center', margin: expanded ? '4px 12px 14px' : '4px 8px 14px' }}>
+      <div style={{ ...sbStyles.userRow, padding: showLabels ? '10px 10px' : '10px 0', justifyContent: showLabels ? 'flex-start' : 'center', margin: showLabels ? '4px 12px 14px' : '4px 8px 14px' }}>
         <div style={sbStyles.userAvatar}>А</div>
-        <div style={{ flex: 1, minWidth: 0, overflow: 'hidden', whiteSpace: 'nowrap', opacity: expanded ? 1 : 0, width: expanded ? 'auto' : 0, transition: 'opacity .18s' }}>
+        <div style={{ flex: 1, minWidth: 0, overflow: 'hidden', whiteSpace: 'nowrap', opacity: showLabels ? 1 : 0, width: showLabels ? 'auto' : 0, transition: 'opacity .18s' }}>
           <div style={sbStyles.userName}>Андрій Мельник</div>
           <div style={sbStyles.userRole}>{t.owner}</div>
         </div>

@@ -488,6 +488,15 @@ const DASHBOARDS = {
       </>
     ),
   },
+  critical: {
+    title: 'Критичні події',
+    sub: 'що потребує нашої уваги прямо зараз',
+    layout: () => (
+      <>
+        <div style={{ gridColumn: 'span 12' }}><ProblemsList /></div>
+      </>
+    ),
+  },
   problems: {
     title: 'Проблеми',
     sub: '4 активні події, що потребують уваги',
@@ -514,8 +523,9 @@ function DashboardView({ kind, onBack }) {
   const { t } = useI18n();
   const isEn = t === DICT.en;
   const TITLES = {
-    day:      { title: t.d_day_title, sub: t.d_day_sub },
-    recs:     { title: t.d_recs_title, sub: t.d_recs_sub },
+    day:      { title: t.d_day_title || t.q_day, sub: t.d_day_sub || t.a_sub },
+    recs:     { title: t.d_recs_title || '', sub: t.d_recs_sub || '' },
+    critical: { title: t.q_critical, sub: t.a_sub },
     revenue:  { title: t.d_rev_title, sub: t.d_rev_sub },
     compare:  { title: t.d_cmp_title, sub: t.d_cmp_sub },
     top:      { title: t.d_top_title, sub: t.d_top_sub },

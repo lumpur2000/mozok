@@ -1,23 +1,21 @@
-// Live event feed — i18n
+// Live event feed — compact single-line ticker with varied events
 
-function EventCard({ ev, fresh, kindMap, tagStop, tagUrgent }) {
+function FeedRow({ ev, fresh, kindMap, tagStop, tagUrgent }) {
   const kind = kindMap[ev.kind];
   const Icon = Icons[kind.icon];
   return (
-    <div style={{ ...fStyles.card, borderLeftColor: kind.color, animation: fresh ? 'slideIn .35s ease-out' : 'none', boxShadow: fresh ? '0 0 0 2px rgba(46,204,113,.12)' : '0 1px 2px rgba(14,27,44,.03)' }}>
-      <div style={{ ...fStyles.cardIcon, background: kind.bg, color: kind.fg }}><Icon size={14} /></div>
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={fStyles.cardTitleRow}>
-          <span style={fStyles.cardTitle}>{ev.title}</span>
-          {ev.tag && <span style={{ ...fStyles.pill, background: kind.bg, color: kind.fg }}>{ev.tag}</span>}
-          {ev.urgent && <span style={fStyles.urgentPill}>{tagUrgent}</span>}
-        </div>
-        <div style={fStyles.cardMeta}>{ev.meta}</div>
-      </div>
-      <div style={fStyles.cardRight}>
-        <div style={fStyles.time}>{ev.t}</div>
-        {ev.amount && <div style={fStyles.amount}>{ev.amount}</div>}
-      </div>
+    <div className="feed-row" style={{
+      ...fStyles.row,
+      borderLeftColor: kind.color,
+      animation: fresh ? 'feedSlide .35s ease-out' : 'none',
+      background: fresh ? kind.bg : 'transparent',
+    }}>
+      <span style={{ ...fStyles.rowIcon, background: kind.bg, color: kind.fg }}><Icon size={11} /></span>
+      <span style={fStyles.rowTitle}>{ev.title}</span>
+      {ev.tag && <span style={{ ...fStyles.pill, background: kind.bg, color: kind.fg }}>{ev.tag}</span>}
+      {ev.urgent && <span style={fStyles.urgentPill}>{tagUrgent}</span>}
+      {ev.amount && <span style={fStyles.amount}>{ev.amount}</span>}
+      <span style={fStyles.time}>{ev.t}</span>
     </div>
   );
 }
@@ -35,17 +33,58 @@ function LiveFeed() {
     brain:   { color: 'var(--violet)',     bg: 'var(--violet-soft)', fg: '#4F3DAC',           icon: 'Sparkle' },
   };
 
+  const isEn = t === DICT.en;
+
+  // Pool of varied event generators
+  const generators = React.useMemo(() => [
+    () => {
+      const n = 54 + Math.floor(Math.random() * 30);
+      const tbl = 1 + Math.floor(Math.random() * 12);
+      const amt = 200 + Math.floor(Math.random() * 700);
+      const o = t.ev.order_new(n, tbl, isEn ? 'Maryna' : 'Марина');
+      return { kind: 'order', title: o.title, amount: `+${money(amt)}` };
+    },
+    () => ({
+      kind: 'pay',
+      title: isEn ? `Payment · table ${1 + Math.floor(Math.random()*12)}` : `Оплата · столик ${1 + Math.floor(Math.random()*12)}`,
+      amount: `+${money(300 + Math.floor(Math.random()*600))}`,
+    }),
+    () => ({
+      kind: 'kitchen',
+      title: isEn ? `Kitchen picked up order #${60 + Math.floor(Math.random()*30)}` : `Кухня взяла в роботу #${60 + Math.floor(Math.random()*30)}`,
+    }),
+    () => ({
+      kind: 'ready',
+      title: isEn ? `Ready: ${['Tom Yum','Carbonara','Caesar','Burger'][Math.floor(Math.random()*4)]}` : `Готово: ${['Том Ям','Карбонара','Цезар','Бургер'][Math.floor(Math.random()*4)]}`,
+      urgent: Math.random() > 0.7,
+    }),
+    () => ({
+      kind: 'stop',
+      title: isEn ? `Stop-list: ${['Salmon','Tiramisu','Cheesecake','Shrimp'][Math.floor(Math.random()*4)]}` : `Стоп-лист: ${['Лосось','Тірамісу','Чізкейк','Креветки'][Math.floor(Math.random()*4)]}`,
+      tag: t.tag_stop,
+    }),
+    () => ({
+      kind: 'staff',
+      title: isEn ? `${['Ihor','Iryna','Taras'][Math.floor(Math.random()*3)]} opened a shift` : `${['Ігор','Ірина','Тарас'][Math.floor(Math.random()*3)]} відкрив зміну`,
+    }),
+    () => ({
+      kind: 'brain',
+      title: isEn ? 'We forecast a spike in 12 min' : 'У нас прогноз сплеску за 12 хв',
+      tag: t.tag_ai,
+    }),
+  ], [t, isEn, money]);
+
   const buildInitial = () => {
     const e = t.ev;
-    const o1 = e.order_new(53, 4, t.chat_status.includes('online') ? 'Oleksandr' : 'Олександр');
+    const o1 = e.order_new(53, 4, isEn ? 'Oleksandr' : 'Олександр');
     return [
-      { id: 7, t: '12:41', kind: 'order', title: o1.title, meta: o1.meta + ` · ${money(620)}`, amount: `+${money(620)}` },
-      { id: 6, t: '12:38', kind: 'stop', title: e.stop, meta: e.stop_meta, tag: t.tag_stop },
-      { id: 5, t: '12:35', kind: 'ready', title: e.ready, meta: e.ready_meta, urgent: true },
-      { id: 4, t: '12:31', kind: 'kitchen', title: e.kitchen, meta: e.kitchen_meta },
-      { id: 3, t: '12:29', kind: 'pay', title: `${e.pay} ${money(840)}`, meta: `${e.pay_meta} ${money(60)}`, amount: `+${money(840)}` },
-      { id: 2, t: '12:24', kind: 'staff', title: e.staff, meta: e.staff_meta },
-      { id: 1, t: '12:18', kind: 'brain', title: e.brain, meta: e.brain_meta, tag: t.tag_ai },
+      { id: 7, t: '12:41', kind: 'order', title: o1.title, amount: `+${money(620)}` },
+      { id: 6, t: '12:38', kind: 'stop', title: e.stop, tag: t.tag_stop },
+      { id: 5, t: '12:35', kind: 'ready', title: e.ready, urgent: true },
+      { id: 4, t: '12:31', kind: 'kitchen', title: e.kitchen },
+      { id: 3, t: '12:29', kind: 'pay', title: `${e.pay} · ${isEn ? 'table 2' : 'столик 2'}`, amount: `+${money(840)}` },
+      { id: 2, t: '12:24', kind: 'staff', title: e.staff },
+      { id: 1, t: '12:18', kind: 'brain', title: e.brain, tag: t.tag_ai },
     ];
   };
 
@@ -54,24 +93,27 @@ function LiveFeed() {
   const [freshId, setFreshId] = React.useState(null);
   const nextId = React.useRef(8);
 
-  // rebuild when locale changes
   React.useEffect(() => { setEvents(buildInitial()); }, [t, currency]);
 
   React.useEffect(() => {
-    const id = setInterval(() => {
-      const e = t.ev;
-      const n = 54 + Math.floor(Math.random() * 20);
-      const o = e.order_new(n, 1 + Math.floor(Math.random()*12), t === DICT.en ? 'Maryna' : 'Марина');
-      const now = new Date();
-      const hhmm = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
-      const newId = nextId.current++;
-      const amt = 200 + Math.floor(Math.random() * 600);
-      setEvents(prev => [{ id: newId, t: hhmm, kind: 'order', title: o.title, meta: o.meta + ` · ${money(amt)}`, amount: `+${money(amt)}` }, ...prev].slice(0, 30));
-      setFreshId(newId);
-      setTimeout(() => setFreshId(null), 1200);
-    }, 5000);
-    return () => clearInterval(id);
-  }, [t, currency]);
+    let timer;
+    const schedule = () => {
+      const delay = 5000 + Math.random() * 3000; // 5–8s
+      timer = setTimeout(() => {
+        const gen = generators[Math.floor(Math.random() * generators.length)];
+        const ev = gen();
+        const now = new Date();
+        const hhmm = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+        const newId = nextId.current++;
+        setEvents(prev => [{ id: newId, t: hhmm, ...ev }, ...prev].slice(0, 40));
+        setFreshId(newId);
+        setTimeout(() => setFreshId(null), 1400);
+        schedule();
+      }, delay);
+    };
+    schedule();
+    return () => clearTimeout(timer);
+  }, [generators]);
 
   const filtered = filter === 'all' ? events : events.filter(e => e.kind === filter);
   const FILTERS = [
@@ -89,10 +131,10 @@ function LiveFeed() {
             <span style={{ width: 6, height: 6, borderRadius: 99, background: '#2ECC71', animation: 'pulseDot 1.8s infinite' }} />
             {t.feed_online}
           </div>
-          <div style={fStyles.countMuted}>{t.feed_count(events.length)}</div>
         </div>
+        <div style={fStyles.countMuted}>{t.feed_count(events.length)}</div>
       </div>
-      <div style={fStyles.filterRow}>
+      <div className="feed-filter-row" style={fStyles.filterRow}>
         {FILTERS.map(f => (
           <button key={f.key} onClick={() => setFilter(f.key)}
             style={{ ...fStyles.filter, ...(filter === f.key ? fStyles.filterActive : {}) }}>
@@ -102,7 +144,7 @@ function LiveFeed() {
         ))}
       </div>
       <div style={fStyles.scroll}>
-        {filtered.map(ev => <EventCard key={ev.id} ev={ev} fresh={ev.id === freshId} kindMap={kindMap} tagStop={t.tag_stop} tagUrgent={t.tag_urgent} />)}
+        {filtered.map(ev => <FeedRow key={ev.id} ev={ev} fresh={ev.id === freshId} kindMap={kindMap} tagStop={t.tag_stop} tagUrgent={t.tag_urgent} />)}
         {filtered.length === 0 && <div style={{ padding: 40, textAlign: 'center', color: 'var(--ink-3)', fontSize: 12 }}>{t.feed_empty}</div>}
       </div>
     </div>
@@ -111,25 +153,29 @@ function LiveFeed() {
 
 const fStyles = {
   wrap: { flex: 1, minHeight: 0, background: 'var(--card)', border: '1px solid var(--hairline)', borderRadius: 12, display: 'flex', flexDirection: 'column', boxShadow: '0 1px 2px rgba(14,27,44,.03)', overflow: 'hidden' },
-  headerRow: { padding: '14px 16px 10px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid var(--hairline-2)' },
-  title: { fontSize: 15, fontWeight: 600, color: 'var(--ink)' },
-  liveBadge: { display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 10.5, fontWeight: 600, color: 'var(--green-deep)', padding: '3px 8px', background: 'var(--green-soft)', borderRadius: 99, textTransform: 'uppercase', letterSpacing: .4 },
-  countMuted: { fontSize: 11.5, color: 'var(--ink-3)' },
-  filterRow: { display: 'flex', gap: 6, padding: '10px 16px', borderBottom: '1px solid var(--hairline-2)', overflowX: 'auto' },
-  filter: { display: 'inline-flex', alignItems: 'center', gap: 6, padding: '5px 10px', borderRadius: 99, fontSize: 11.5, fontWeight: 500, background: 'transparent', color: 'var(--ink-2)', border: '1px solid var(--hairline)', cursor: 'pointer', whiteSpace: 'nowrap' },
+  headerRow: { padding: '12px 14px 8px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid var(--hairline-2)' },
+  title: { fontSize: 14, fontWeight: 600, color: 'var(--ink)' },
+  liveBadge: { display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: 10, fontWeight: 600, color: 'var(--green-deep)', padding: '2px 7px', background: 'var(--green-soft)', borderRadius: 99, textTransform: 'uppercase', letterSpacing: .4 },
+  countMuted: { fontSize: 11, color: 'var(--ink-3)', fontFamily: 'JetBrains Mono, monospace' },
+  filterRow: { display: 'flex', gap: 4, padding: '8px 12px', borderBottom: '1px solid var(--hairline-2)', overflowX: 'auto' },
+  filter: { display: 'inline-flex', alignItems: 'center', gap: 5, padding: '4px 9px', borderRadius: 99, fontSize: 11, fontWeight: 500, background: 'transparent', color: 'var(--ink-2)', border: '1px solid var(--hairline)', cursor: 'pointer', whiteSpace: 'nowrap', fontFamily: 'inherit' },
   filterActive: { background: 'var(--ink)', color: '#fff', borderColor: 'var(--ink)' },
   aiDot: { width: 5, height: 5, borderRadius: 99, background: 'var(--violet)' },
-  scroll: { flex: 1, overflowY: 'auto', padding: '8px 10px 12px', display: 'flex', flexDirection: 'column', gap: 6 },
-  card: { display: 'flex', alignItems: 'flex-start', gap: 10, padding: '10px 12px', background: '#FBFAF7', border: '1px solid var(--hairline-2)', borderLeft: '3px solid transparent', borderRadius: 8, transition: 'background .2s' },
-  cardIcon: { width: 26, height: 26, borderRadius: 7, display: 'grid', placeItems: 'center', flexShrink: 0 },
-  cardTitleRow: { display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' },
-  cardTitle: { fontSize: 13, fontWeight: 500, color: 'var(--ink)' },
-  cardMeta: { fontSize: 11.5, color: 'var(--ink-3)', marginTop: 2 },
-  pill: { fontSize: 9.5, fontWeight: 700, letterSpacing: .4, padding: '1px 6px', borderRadius: 4 },
-  urgentPill: { fontSize: 9.5, fontWeight: 700, letterSpacing: .4, padding: '1px 6px', borderRadius: 4, background: 'var(--red-soft)', color: '#A93A37', textTransform: 'uppercase' },
-  cardRight: { display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 2, flexShrink: 0 },
-  time: { fontFamily: 'JetBrains Mono, monospace', fontSize: 11, color: 'var(--ink-3)', fontWeight: 500 },
-  amount: { fontFamily: 'JetBrains Mono, monospace', fontSize: 11.5, fontWeight: 600, color: 'var(--green-deep)' },
+  scroll: { flex: 1, overflowY: 'auto', padding: '4px 0' },
+  row: {
+    display: 'flex', alignItems: 'center', gap: 8,
+    padding: '7px 14px',
+    borderLeft: '2px solid transparent',
+    borderBottom: '1px solid var(--hairline-2)',
+    fontSize: 12.5, lineHeight: 1.3,
+    transition: 'background .3s',
+  },
+  rowIcon: { width: 20, height: 20, borderRadius: 5, display: 'grid', placeItems: 'center', flexShrink: 0 },
+  rowTitle: { flex: 1, minWidth: 0, color: 'var(--ink)', fontWeight: 500, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' },
+  pill: { fontSize: 9, fontWeight: 700, letterSpacing: .4, padding: '1px 5px', borderRadius: 3, flexShrink: 0 },
+  urgentPill: { fontSize: 9, fontWeight: 700, letterSpacing: .4, padding: '1px 5px', borderRadius: 3, background: 'var(--red-soft)', color: '#A93A37', textTransform: 'uppercase', flexShrink: 0 },
+  amount: { fontFamily: 'JetBrains Mono, monospace', fontSize: 11, fontWeight: 600, color: 'var(--green-deep)', flexShrink: 0 },
+  time: { fontFamily: 'JetBrains Mono, monospace', fontSize: 10.5, color: 'var(--ink-3)', fontWeight: 500, flexShrink: 0, width: 36, textAlign: 'right' },
 };
 
 Object.assign(window, { LiveFeed });

@@ -2,10 +2,8 @@
 
 function classifyQuery(text) {
   const t = text.toLowerCase();
-  if (/(підсум|порад|рекоменд|recommend|advice|summary|how was)/.test(t)) {
-    if (/(рекоменд|порад|recommend|advice)/.test(t)) return 'recs';
-    return 'day';
-  }
+  if (/(критич|critical|urgent|термінов)/.test(t)) return 'critical';
+  if (/(підсум|пройшов|summary|how was)/.test(t)) return 'day';
   if (/(топ|популярн|найкращ|страв|dish|top|rating)/.test(t)) return 'top';
   if (/(порівн|минул|вчора|тижд|compare|yesterday|last)/.test(t)) return 'compare';
   if (/(проблем|стоп|offline|помилк|issue|problem)/.test(t)) return 'problems';
@@ -17,13 +15,13 @@ function classifyQuery(text) {
 function buildReplies(t, money, sym) {
   const isEn = t === DICT.en;
   return {
-    revenue: { head: `${money(14820)} · ${isEn ? 'margin 31%' : 'маржа 31%'}`, body: isEn ? 'Above-average Tuesday. Dashboard on the right has hourly breakdown and top dishes.' : 'Вище середнього вівторка. Дашборд справа — погодинна розбивка та топ страв.' },
-    compare: { head: isEn ? "Today's 12% better" : 'Сьогодні на 12% краще', body: isEn ? `Last Tuesday at this time: ${money(13240)}. Mostly driven by +6 more orders.` : `Мин. вівторок на цей час: ${money(13240)}. Різниця головним чином у кількості замовлень (+6).` },
-    top:     { head: isEn ? 'Top 6 today' : 'Топ-6 за сьогодні', body: isEn ? 'Brain Burger & Tom Yum lead. Cheesecake is underperforming — 32 views, 4 sales.' : 'Бургер «Мозок» та Том Ям лідирують. Чізкейк просідає — 32 перегляди, 4 продажі.' },
-    problems:{ head: isEn ? '4 active issues' : '4 активні проблеми', body: isEn ? 'Tom Yum on table 7 waiting for waiter. Terminal #2 offline 14 min. Stop-list: salmon.' : 'Том Ям на ст. 7 чекає офіціанта. Термінал #2 оффлайн 14 хв. Стоп-лист: лосось.' },
-    staff:   { head: isEn ? '6 on shift · 2 en route' : '6 на зміні · 2 в дорозі', body: isEn ? 'Maryna is 12 min late. Ihor has worked 2 h, Iryna — 4 h.' : 'Марина запізнюється на 12 хв. Ігор працює 2 год, Ірина — 4 год.' },
-    day:     { head: isEn ? 'Overall — a strong day' : 'Загалом — сильний день', body: isEn ? 'Revenue +12%, 47 orders, NPS 4.7. Opened the report — breakdown by hours, categories, staff.' : 'Виручка +12%, 47 замовлень, NPS 4.7. Відкрила звіт — там розбивка по годинах, категоріях, персоналу.' },
-    recs:    { head: isEn ? '5 recommendations for you' : '5 рекомендацій для вас', body: isEn ? 'Raise Tom Yum price, replace cheesecake, add a waiter for peak, optimize salmon sourcing.' : 'Підняти ціну на Том Ям, замінити Чізкейк, додати офіціанта на пік, оптимізувати закупку лосося.' },
+    revenue: { head: `${money(14820)} · ${isEn ? 'margin 31%' : 'маржа 31%'}`, body: isEn ? 'We’re above an average Tuesday. Opening our hourly breakdown and top dishes so you can see where the lift came from.' : 'У нас вище середнього вівторка. Відкриваю погодинну розбивку і топ страв — побачимо, звідки прийшов приріст.' },
+    compare: { head: isEn ? 'We’re 12% ahead of last Tuesday' : 'Ми на 12% попереду минулого вівторка', body: isEn ? `Last Tuesday at this time we had ${money(13240)}. The lift mostly came from +6 more orders.` : `Минулого вівторка на цей час у нас було ${money(13240)}. Приріст головним чином від +6 замовлень.` },
+    top:     { head: isEn ? 'Our top 6 today' : 'Наш топ-6 за сьогодні', body: isEn ? 'Brain Burger & Tom Yum lead us. Cheesecake is slipping — 32 views, 4 sales. We should think about it.' : 'Бургер «Мозок» та Том Ям ведуть нас. Чізкейк просідає — 32 перегляди, 4 продажі. Нам варто подумати.' },
+    problems:{ head: isEn ? 'We have 4 active issues' : 'У нас 4 активні проблеми', body: isEn ? 'Tom Yum on table 7 is waiting for a waiter. Terminal #2 has been offline 14 min. Salmon is on our stop-list.' : 'Том Ям на ст. 7 чекає офіціанта. Термінал #2 офлайн 14 хв. Лосось у нас у стоп-листі.' },
+    staff:   { head: isEn ? '6 of us on shift · 2 en route' : 'Нас 6 на зміні · 2 в дорозі', body: isEn ? 'Maryna is 12 min late. Ihor has been with us 2 h, Iryna — 4 h.' : 'Марина запізнюється на 12 хв. Ігор з нами 2 год, Ірина — 4 год.' },
+    day:     { head: isEn ? 'Overall — we’re having a strong day' : 'Загалом — ми маємо сильний день', body: isEn ? 'Revenue +12%, 47 orders, NPS 4.7. Opening our full report — hours, categories, staff.' : 'Виручка +12%, 47 замовлень, NPS 4.7. Відкриваю наш повний звіт — години, категорії, персонал.' },
+    critical:{ head: isEn ? 'Nothing critical for us right now' : 'У нас зараз нічого критичного', body: isEn ? 'Watching 2 amber items: terminal #2 was offline for 14 min (back up now) and our salmon stop-list. Nothing that needs you this minute.' : 'Стежимо за 2 жовтими: термінал #2 був офлайн 14 хв (вже працює) та наш стоп-лист з лососем. Нічого термінового.' },
   };
 }
 
@@ -82,7 +80,7 @@ function ChatPanel({ onDashboard }) {
 
   const QUICK = [
     { label: t.q_day, icon: 'Sparkle', kind: 'day', featured: true },
-    { label: t.q_recs, icon: 'Sparkle', kind: 'recs', featured: true },
+    { label: t.q_critical, icon: 'Bell', kind: 'critical', featured: true },
     { label: t.q_revenue, icon: 'Receipt', kind: 'revenue' },
     { label: t.q_top, icon: 'Chart', kind: 'top' },
     { label: t.q_problems, icon: 'Bell', kind: 'problems' },
@@ -100,8 +98,7 @@ function ChatPanel({ onDashboard }) {
       const REPLIES = buildReplies(t, money, sym);
       if (kind) {
         const reply = REPLIES[kind];
-        setMsgs(prev => [...prev, { role: 'ai', text: reply.head, explain: reply.body, dashboard: kind }]);
-        setTimeout(() => onDashboard(kind, text), 400);
+        setMsgs(prev => [...prev, { role: 'ai', text: reply.head, explain: reply.body, dashboard: kind, query: text }]);
       } else {
         setMsgs(prev => [...prev, { role: 'ai', text: t === DICT.en ? 'Got it' : 'Зрозуміла', explain: t === DICT.en ? 'I can show revenue, top dishes, issues, staff, or compare with past days.' : 'Можу показати виручку, топ страв, проблеми, персонал або порівняння з минулими днями.' }]);
       }
@@ -141,7 +138,7 @@ function ChatPanel({ onDashboard }) {
       </div>
 
       <div ref={scrollRef} style={cStyles.scroll}>
-        {msgs.map((m, i) => m.role === 'user' ? <UserBubble key={i} text={m.text} /> : <AiBubble key={i} msg={m} onOpenDashboard={onDashboard} openLabel={t.open_dashboard} />)}
+        {msgs.map((m, i) => m.role === 'user' ? <UserBubble key={i} text={m.text} /> : <AiBubble key={i} msg={m} onOpenDashboard={(kind) => onDashboard(kind, m.query)} openLabel={t.open_dashboard} />)}
         {typing && <Typing />}
       </div>
 

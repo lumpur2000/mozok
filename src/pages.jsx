@@ -133,7 +133,7 @@ function WarehousePage() {
     <div style={pgStyles.page}>
       <PageHead title={t.wh_title} sub={t.wh_sub} />
       <div style={pgStyles.scroll}>
-        <div style={whStyles.grid}>
+        <div className="wh-grid" style={whStyles.grid}>
           {/* Stock */}
           <div style={whStyles.panel}>
             <div style={whStyles.panelHead}>{t.wh_stock}</div>
@@ -322,16 +322,16 @@ function SuppliersPage() {
             const isOpen = open === i;
             return (
               <div key={i} style={{ ...spStyles.card, ...(isOpen ? spStyles.cardOpen : {}) }}>
-                <button style={spStyles.cardHead} onClick={() => setOpen(isOpen ? -1 : i)}>
+                <button className="sup-card-head" style={spStyles.cardHead} onClick={() => setOpen(isOpen ? -1 : i)}>
                   <div>
                     <div style={spStyles.supName}>{s.n}</div>
                     <div style={spStyles.supCat}>{s.cat}</div>
                   </div>
-                  <div style={spStyles.headMeta}>
+                  <div className="sup-head-cell-secondary" style={spStyles.headMeta}>
                     <span style={spStyles.headLabel}>{t.sup_delivery}</span>
                     <span style={spStyles.headVal}>{s.delivery}</span>
                   </div>
-                  <div style={spStyles.headMeta}>
+                  <div className="sup-head-cell-secondary" style={spStyles.headMeta}>
                     <span style={spStyles.headLabel}>{t.sup_last}</span>
                     <span style={spStyles.headVal}>{s.last}</span>
                   </div>
@@ -417,7 +417,7 @@ function SettingsPage() {
     <div style={pgStyles.page}>
       <PageHead title={t.set_title} sub={t.set_sub} />
       <div style={pgStyles.scroll}>
-        <div style={seStyles.grid}>
+        <div className="se-grid" style={seStyles.grid}>
           {/* Profile */}
           <div style={seStyles.card}>
             <div style={seStyles.cardHead}>{t.set_profile}</div>
