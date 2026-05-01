@@ -50,6 +50,10 @@
     from { transform: translateY(-8px); opacity: 0; }
     to { transform: translateY(0); opacity: 1; }
   }
+  @keyframes feedSlide {
+    from { transform: translateY(-10px); opacity: 0; background: rgba(46,204,113,.12); }
+    to { transform: translateY(0); opacity: 1; }
+  }
   @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
   @keyframes typing {
     0%, 60%, 100% { transform: translateY(0); opacity: .4; }
@@ -63,6 +67,127 @@
     from { transform: scaleY(0); }
     to { transform: scaleY(1); }
   }
+
+  /* ============ RESPONSIVE: ≤ 768 px ============ */
+  @media (max-width: 768px) {
+    /* App shell: hide desktop sidebar, sidebar becomes slide-in drawer */
+    .app-sidebar {
+      position: fixed !important;
+      top: 0 !important;
+      left: 0 !important;
+      bottom: 0 !important;
+      z-index: 80 !important;
+      transition: transform .25s cubic-bezier(.4,0,.2,1) !important;
+      box-shadow: 4px 0 18px rgba(14,27,44,.18) !important;
+    }
+    .app-sidebar[data-mobile-open="false"] { transform: translateX(-100%) !important; }
+    .app-sidebar[data-mobile-open="true"]  { transform: translateX(0) !important; }
+    .app-sidebar .sb-toggle { display: none !important; }
+    .mobile-overlay { display: block !important; }
+
+    /* Top bar: shrink padding, show burger + chat icons */
+    .app-topbar { padding: 12px 16px !important; }
+    .app-topbar-greet { font-size: 16px !important; }
+    .app-topbar-date { font-size: 11px !important; }
+    .app-body { padding: 0 16px 16px !important; }
+    .mobile-burger, .mobile-chat-icon { display: inline-flex !important; }
+
+    /* Dashboard: single column */
+    .dashboard-grid {
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 14px !important;
+      height: auto !important;
+      overflow-y: auto !important;
+    }
+    .dashboard-grid > * { min-height: 0 !important; }
+    .dashboard-feed { min-height: 360px !important; flex-shrink: 0 !important; }
+
+    /* KPI: 2x2 stays but smaller numbers */
+    .kpi-grid { gap: 10px !important; }
+    .kpi-card { padding: 14px 16px 12px !important; }
+    .kpi-card .kpi-value { font-size: 30px !important; letter-spacing: -.6px !important; }
+
+    /* Analytics: each block stacks vertically (chart on top, insight below) */
+    .an-block-card {
+      grid-template-columns: 1fr !important;
+      grid-template-rows: auto auto auto !important;
+    }
+    .an-block-divider {
+      width: 100% !important;
+      height: 1px !important;
+      background: var(--hairline-2) !important;
+    }
+    .an-block-chart { padding: 8px 0 !important; }
+    .block-chart > div { padding: 14px 16px !important; }
+    .an-insight-col { padding: 14px 18px !important; }
+
+    /* Controls timeline: hide the day scale + bar track on mobile, show as cards */
+    .ct-timeline { display: none !important; }
+    .ct-row {
+      grid-template-columns: 1fr !important;
+      gap: 10px !important;
+      padding: 14px 16px !important;
+    }
+    .ct-row-track-wrap { display: none !important; }
+    .ct-row-right { justify-self: flex-start !important; }
+
+    /* Chat: fullscreen */
+    .chat-wrap { width: 100vw !important; }
+
+    /* Pages grids → single column */
+    .wh-grid, .se-grid { grid-template-columns: 1fr !important; }
+    .sup-card-head {
+      grid-template-columns: 1fr 24px !important;
+      gap: 8px !important;
+    }
+    .sup-head-cell-secondary { display: none !important; }
+
+    /* Floating Brain: shrink, icon-only */
+    .float-brain {
+      padding: 0 !important;
+      width: 56px !important;
+      height: 56px !important;
+      border-radius: 50% !important;
+      bottom: 16px !important;
+      right: 16px !important;
+    }
+    .float-brain-icon { width: 56px !important; height: 56px !important; background: transparent !important; }
+    .float-brain-label, .float-brain-pulse { display: none !important; }
+  }
+
+  /* ============ RESPONSIVE: ≤ 480 px ============ */
+  @media (max-width: 480px) {
+    .app-topbar { padding: 10px 14px !important; }
+    .app-body { padding: 0 12px 12px !important; }
+
+    /* KPI: still 2×2 but tighter */
+    .kpi-card { padding: 12px 13px 10px !important; }
+    .kpi-card .kpi-value { font-size: 24px !important; letter-spacing: -.4px !important; }
+    .kpi-card .kpi-label { font-size: 10px !important; }
+    .kpi-card .kpi-extra { display: none !important; }
+
+    /* Feed: tighter rows */
+    .feed-row { padding: 6px 12px !important; font-size: 12px !important; }
+    .feed-filter-row { padding: 6px 10px !important; }
+
+    /* Sidebar drawer: don't expand to 224, just enough */
+    .app-sidebar { width: 240px !important; }
+
+    /* Analytics insight options: collapsed by default — controlled via JS class */
+    .an-options-collapsed .an-options-list { display: none !important; }
+    .an-options-collapsed .an-options-toggle { display: inline-flex !important; }
+
+    .ct-modal { width: 92vw !important; padding: 18px 18px 16px !important; }
+    .ct-bars-row { flex-direction: column !important; gap: 8px !important; }
+    .ct-arrow { transform: rotate(90deg) !important; }
+
+    /* Page heads: tighter */
+    .pg-head-title { font-size: 18px !important; }
+  }
+
+  /* Hide mobile-only chrome on desktop */
+  .mobile-burger, .mobile-chat-icon, .mobile-overlay { display: none; }
 </style>
 </head>
 <body>
@@ -89,6 +214,7 @@
 <script type="text/babel" src="src/feed.jsx"></script>
 <script type="text/babel" src="src/dashboard-view.jsx"></script>
 <script type="text/babel" src="src/analytics.jsx"></script>
+<script type="text/babel" src="src/controls.jsx"></script>
 <script type="text/babel" src="src/pages.jsx"></script>
 <script type="text/babel" src="src/chat.jsx"></script>
 <script type="text/babel" src="src/tweaks.jsx"></script>
